@@ -1,20 +1,16 @@
 import React, { ChangeEvent, useState } from 'react'
+import type { TSettings } from '../../types'
 
-type T = {
-  difficultyWords: string
-  mistakesLimit: number
-}
-
-type TProps = T & {
-  onSetSettings: (newSettings: T) => void
+type TProps = TSettings & {
+  setSettings: (newSettings: TSettings) => void
 }
 
 export const SettingsPage: React.FC<TProps> = ({
   difficultyWords,
   mistakesLimit,
-  onSetSettings,
+  setSettings,
 }) => {
-  const [newSettings, setNewSettings] = useState<T>({
+  const [newSettings, setNewSettings] = useState<TSettings>({
     difficultyWords,
     mistakesLimit,
   })
@@ -28,38 +24,43 @@ export const SettingsPage: React.FC<TProps> = ({
   }
 
   return (
-    <>
-      <form action=''>
+    <div className="menu">
+      <form action="">
         <div>
           <span>Уровень сложности слов: </span>
           <select
-            name='difficultyWords'
-            id=''
+            name="difficultyWords"
+            id=""
             value={newSettings.difficultyWords}
             onChange={changeNewSettingsHandler}
           >
-            <option value='easy'>Лёгкий</option>
-            <option value='medium'>Средний</option>
-            <option value='hard'>Тяжёлый</option>
+            <option value="easy">Лёгкий</option>
+            <option value="medium">Средний</option>
+            <option value="hard">Тяжёлый</option>
           </select>
         </div>
         <div>
           <span>Лимит ошибок: </span>
           <select
-            name='mistakesLimit'
-            id=''
+            name="mistakesLimit"
+            id=""
             value={newSettings.mistakesLimit}
             onChange={changeNewSettingsHandler}
           >
-            <option value='4'>4</option>
-            <option value='6'>6</option>
-            <option value='8'>8</option>
-            <option value='10'>10</option>
-            <option value='14'>14</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+            <option value="14">14</option>
           </select>
         </div>
       </form>
-      <button onClick={() => onSetSettings(newSettings)}>Применить</button>
-    </>
+      <button
+        className="button__apply"
+        onClick={() => setSettings(newSettings)}
+      >
+        Применить
+      </button>
+    </div>
   )
 }

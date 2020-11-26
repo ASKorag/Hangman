@@ -5,6 +5,10 @@ import { MainPage } from './components/MainPage/MainPage'
 import { SettingsPage } from './components/SettingsPage/SettingsPage'
 import { AboutPage } from './components/AboutPage/AboutPage'
 import './Hangman.css'
+import { PlayPage } from './components/PlayPage/PlayPage'
+import { words } from './words'
+
+import type { TSettings, TGameVariables } from './types'
 
 declare global {
   interface Window {
@@ -13,28 +17,14 @@ declare global {
   }
 }
 
-type TGameVariables = {
-  sourcedWord: string
-  guessedWord: string[]
-  wrongLetters: string[]
-  correctLetters: string[]
-  mistakesCounter: number | null
-  lettersLeft: number | null
-}
-
-type TSettings = {
-  difficultyWords: string
-  mistakesLimit: number
-}
-
 const Hangman: React.FC = () => {
   const [gameVariables, setGameVariables] = useState<TGameVariables>({
+    isPlaying: false,
     sourcedWord: '',
     guessedWord: [],
-    wrongLetters: [],
-    correctLetters: [],
-    mistakesCounter: null,
-    lettersLeft: null,
+    checkedLetters: [],
+    mistakesCounter: 0,
+    lettersLeft: 10,
   })
   const [settings, setSettings] = useState<TSettings>({
     difficultyWords: 'medium',
@@ -42,13 +32,40 @@ const Hangman: React.FC = () => {
   })
 
   useEffect(() => {
+    console.clear()
     console.log(JSON.stringify(settings, null, 2))
-  }, [settings])
+    console.log(JSON.stringify(gameVariables, null, 2))
+  }, [settings, gameVariables])
 
-  const onSetSettings = (newSettings: TSettings) => {
-    setSettings({
-      difficultyWords: newSettings.difficultyWords,
-      mistakesLimit: newSettings.mistakesLimit,
+  useEffect(() => {
+    if (gameVariables.mistakesCounter === settings.mistakesLimit) {
+      alert('Игра окончена')
+    }
+    if (gameVariables.lettersLeft === 0) {
+      alert('Поздравляю, Вы победили')
+    }
+  }, [
+    gameVariables.lettersLeft,
+    gameVariables.mistakesCounter,
+    settings.mistakesLimit,
+  ])
+
+  const startGame = () => {
+    setGameVariables({
+      ...gameVariables,
+      isPlaying: true,
+    })
+  }
+
+  const initGameVariables = (words: string[]) => {
+    const randomNumber: number = Math.floor(Math.random() * words.length)
+    const word: string = words[randomNumber]
+    setGameVariables({
+      ...gameVariables,
+      sourcedWord: word,
+      guessedWord: Array(word.length).fill(' '),
+      lettersLeft: word.length,
+      mistakesCounter: 0,
     })
   }
 
@@ -56,20 +73,37 @@ const Hangman: React.FC = () => {
   window.variables = gameVariables || {}
 
   return (
-    <>
-      <Route render={() => <MainPage isPlaying={false} />} path='/' exact />
+    <div className="hangman">
+      <Route
+        render={() => (
+          <MainPage isPlaying={gameVariables.isPlaying} startGame={startGame} />
+        )}
+        path="/"
+        exact
+      />
       <Route
         render={() => (
           <SettingsPage
             difficultyWords={settings.difficultyWords}
             mistakesLimit={settings.mistakesLimit}
-            onSetSettings={onSetSettings}
+            setSettings={setSettings}
           />
         )}
-        path='/settings'
+        path="/settings"
       />
-      <Route render={() => <AboutPage />} path='/about' />
-    </>
+      <Route render={() => <AboutPage />} path="/about" />
+      <Route
+        render={() => (
+          <PlayPage
+            settings={settings}
+            gameVariables={gameVariables}
+            words={words['medium']}
+            setGameVariables={setGameVariables}
+          />
+        )}
+        path="/play"
+      />
+    </div>
   )
 }
 

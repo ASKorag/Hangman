@@ -1,22 +1,30 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
+//import 'materialize-css'
+//import { Button } from 'react-materialize'
+//import s from './MainPage.module.css'
 
-type TMainPage = {
+type T = {
   isPlaying: boolean
+  startGame: () => void
 }
 
-export const MainPage: React.FC<TMainPage> = props => {
+export const MainPage: React.FC<T> = (props) => {
   return (
-    <>
-      <Link to='/play'>
-        <button>{props.isPlaying ? 'Продолжить игру' : 'Новая игра'}</button>
+    <div className="menu">
+      <Link
+        className="menu__button button__game"
+        to="/play"
+        onClick={() => props.startGame()}
+      >
+        {props.isPlaying ? 'Продолжить игру' : 'Новая игра'}
       </Link>
-      <Link to='/settings'>
-        <button>Настройки</button>
+      <Link className="menu__button button__settings" to="/settings">
+        Настройки
       </Link>
-      <Link to='/about'>
-        <button>Об игре</button>
+      <Link className="menu__button button__about" to="/about">
+        Об игре
       </Link>
-    </>
+    </div>
   )
 }
